@@ -32,10 +32,12 @@ DEBUG = True
 
 ALLOWED_HOSTS = []
 
+AUTH_USER_MODEL = 'core_auth.User'
 
 # Application definition
 
 INSTALLED_APPS = [
+    'auth.apps.AuthConfig',
     'movies.apps.MoviesConfig',
     'studios.apps.StudiosConfig',
     'seats.apps.SeatsConfig',

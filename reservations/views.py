@@ -4,6 +4,7 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework_simplejwt.authentication import JWTAuthentication
 
+from auth.permissions import IsAdminOrSuperUser, IsOwnerOrAdminOrSuperUser, IsAdminOrStudioManagerOrSuperUser
 from .models import Reservation, ReservedSeat
 from reservations.serializers import ReservationSerializer, ReservedSeatSerializer
 from django.http import Http404
@@ -11,7 +12,12 @@ from django.http import Http404
 # Create your views here.
 class ReservationListCreateView(APIView):
     authentication_classes = [JWTAuthentication]
-    permission_classes = [IsAuthenticated]
+
+    def get_permissions(self):
+        if self.request.method == 'GET':
+            return [IsAuthenticated(), IsAdminOrSuperUser()]
+
+        return [IsAuthenticated()]
 
     def get(self, request):
         reservations = Reservation.objects.all().order_by('reserved_at')[:10]
@@ -27,7 +33,12 @@ class ReservationListCreateView(APIView):
 
 class ReservationDetailView(APIView):
     authentication_classes = [JWTAuthentication]
-    permission_classes = [IsAuthenticated]
+
+    def get_permissions(self):
+        if self.request.method == 'PUT':
+            return [IsAuthenticated(), IsAdminOrSuperUser()]
+
+        return [IsAuthenticated(), IsOwnerOrAdminOrSuperUser()]
 
     def get_object(self, pk):
         try:

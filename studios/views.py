@@ -4,6 +4,7 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework_simplejwt.authentication import JWTAuthentication
 
+from auth.permissions import IsAdminOrStudioManagerOrSuperUser
 from .models import Studio, StudioManager
 from .serializers import StudioSerializer, StudioManagerSerializer
 from django.http import Http404
@@ -11,7 +12,12 @@ from django.http import Http404
 # Create your views here.
 class StudioListCreateView(APIView):
     authentication_classes = [JWTAuthentication]
-    permission_classes = [IsAuthenticated]
+
+    def get_permissions(self):
+        if self.request.method == 'POST':
+            return [IsAuthenticated(), IsAdminOrStudioManagerOrSuperUser()]
+
+        return [IsAuthenticated()]
 
     def get(self, request):
         studios = Studio.objects.all().order_by('name')[:10]
@@ -27,7 +33,12 @@ class StudioListCreateView(APIView):
 
 class StudioDetailView(APIView):
     authentication_classes = [JWTAuthentication]
-    permission_classes = [IsAuthenticated]
+
+    def get_permissions(self):
+        if self.request.method != 'GET':
+            return [IsAuthenticated(), IsAdminOrStudioManagerOrSuperUser()]
+
+        return [IsAuthenticated()]
 
     def get_object(self, pk):
         try:
@@ -57,7 +68,9 @@ class StudioDetailView(APIView):
 
 class StudioManagerListCreateView(APIView):
     authentication_classes = [JWTAuthentication]
-    permission_classes = [IsAuthenticated]
+
+    def get_permissions(self):
+        return [IsAuthenticated(), IsAdminOrStudioManagerOrSuperUser()]
 
     def get(self, request):
         studio_managers = StudioManager.objects.select_related('user', 'studio').all().order_by('user__username')[:10]
@@ -73,7 +86,9 @@ class StudioManagerListCreateView(APIView):
 
 class StudioManagerDetailView(APIView):
     authentication_classes = [JWTAuthentication]
-    permission_classes = [IsAuthenticated]
+
+    def get_permissions(self):
+        return [IsAdminOrStudioManagerOrSuperUser()]
 
     def get_object(self, pk):
         try:
