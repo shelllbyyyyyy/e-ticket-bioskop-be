@@ -1,12 +1,18 @@
 from rest_framework import status
+from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
+from rest_framework_simplejwt.authentication import JWTAuthentication
+
 from .models import Seat
 from .serializers import SeatSerializer
 from django.http import Http404
 
 # Create your views here.
 class SeatListCreateView(APIView):
+    authentication_classes = [JWTAuthentication]
+    permission_classes = [IsAuthenticated]
+
     def get(self, request):
         seats = Seat.objects.all().order_by('seat_number')[:10]
         serializer = SeatSerializer(seats, many=True)
@@ -20,6 +26,9 @@ class SeatListCreateView(APIView):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 class SeatDetailView(APIView):
+    authentication_classes = [JWTAuthentication]
+    permission_classes = [IsAuthenticated]
+
     def get_object(self, pk):
         try:
             seat = Seat.objects.get(pk=pk)

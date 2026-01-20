@@ -41,6 +41,7 @@ INSTALLED_APPS = [
     'seats.apps.SeatsConfig',
     'showtimes.apps.ShowtimesConfig',
     'reservations.apps.ReservationsConfig',
+    'rest_framework_simplejwt',
     'rest_framework',
     'django.contrib.admin',
     'django.contrib.auth',
@@ -79,6 +80,12 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = 'movie_go.wsgi.application'
+
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+        'rest_framework_simplejwt.authentication.JWTAuthentication',
+    )
+}
 
 
 # Database

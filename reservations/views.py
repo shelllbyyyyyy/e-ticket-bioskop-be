@@ -1,12 +1,18 @@
 from rest_framework import status
+from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
+from rest_framework_simplejwt.authentication import JWTAuthentication
+
 from .models import Reservation, ReservedSeat
 from reservations.serializers import ReservationSerializer, ReservedSeatSerializer
 from django.http import Http404
 
 # Create your views here.
 class ReservationListCreateView(APIView):
+    authentication_classes = [JWTAuthentication]
+    permission_classes = [IsAuthenticated]
+
     def get(self, request):
         reservations = Reservation.objects.all().order_by('reserved_at')[:10]
         serializer = ReservationSerializer(reservations, many=True)
@@ -20,6 +26,9 @@ class ReservationListCreateView(APIView):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 class ReservationDetailView(APIView):
+    authentication_classes = [JWTAuthentication]
+    permission_classes = [IsAuthenticated]
+
     def get_object(self, pk):
         try:
             reservation = Reservation.objects.get(pk=pk)
@@ -47,6 +56,9 @@ class ReservationDetailView(APIView):
         return Response(status=status.HTTP_204_NO_CONTENT)
 
 class ReservedSeatListCreateView(APIView):
+    authentication_classes = [JWTAuthentication]
+    permission_classes = [IsAuthenticated]
+
     def get(self, request):
         reserved_seats = ReservedSeat.objects.all().order_by('seat')[:10]
         serializer = ReservedSeatSerializer(reserved_seats, many=True)
@@ -60,6 +72,9 @@ class ReservedSeatListCreateView(APIView):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 class ReservedSeatDetailView(APIView):
+    authentication_classes = [JWTAuthentication]
+    permission_classes = [IsAuthenticated]
+
     def get_object(self, pk):
         try:
             reserved_seat = ReservedSeat.objects.get(pk=pk)

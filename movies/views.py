@@ -1,12 +1,19 @@
 from rest_framework import status
+from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from django.http import Http404
+from rest_framework_simplejwt.authentication import JWTAuthentication
+
 from .models import Movie
 from .serializers import MovieSerializer
 
 # Create your views here.
+
 class MovieListCreateView(APIView):
+    authentication_classes = [JWTAuthentication]
+    permission_classes = [IsAuthenticated]
+
     def get(self, request):
         movies = Movie.objects.all().order_by('name')[:10]
         serializer = MovieSerializer(movies, many=True)
@@ -20,6 +27,9 @@ class MovieListCreateView(APIView):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 class MovieDetailView(APIView):
+    authentication_classes = [JWTAuthentication]
+    permission_classes = [IsAuthenticated]
+
     def get_object(self, pk):
         try:
             movie = Movie.objects.get(pk=pk)
